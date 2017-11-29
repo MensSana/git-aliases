@@ -1,0 +1,38 @@
+# Normal
+local Noir='\e[0;30m'
+local Rouge='\e[0;31m'
+local Vert='\e[0;32m'
+local Jaune='\e[0;33m'
+local Bleu='\e[0;34m'
+local Pourpre='\e[0;35m'
+local Cyan='\e[0;36m'
+local Blanc='\e[0;37m'
+
+# Bright
+local BNoir='\e[1;30m'
+local BRouge='\e[1;31m'
+local BVert='\e[1;32m'
+local BJaune='\e[1;33m'
+local BBleu='\e[1;34m'
+local BPourpre='\e[1;35m'
+local BCyan='\e[1;36m'
+local BBlanc='\e[1;37m'
+
+# Background
+local BGNoir='\e[40m'
+local BGRouge='\e[41m'
+local BGVert='\e[42m'
+local BGJaune='\e[43m'
+local BGBleu='\e[44m'
+local BGPourpre='\e[45m'
+local BGCyan='\e[46m'
+local BGBlanc='\e[47m'
+
+local Normal='\e[m'
+
+local I=" ${BCyan}*${Normal}"
+local J=" ${BCyan}--*${Normal}"
+
+local Souligne="$(tput smul)"
+local NonSouligne="$(tput rmul)"
+local Gras="$(tput bold)"

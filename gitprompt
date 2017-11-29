@@ -1,0 +1,84 @@
+
+__git_branch () 
+{
+	local b="$(git symbolic-ref HEAD 2>/dev/null)"
+	if [ -n "$b" ]
+	then
+		echo ${b##refs/heads/};
+	fi
+}
+
+__git_dirty ()
+{
+	. /etc/couleurs
+	local GIT_LOCAL="$([ "$GIT_STATUS" == "." ] && echo ".")"
+	git status $GIT_LOCAL 2> /dev/null | grep -c : | awk '{if ($1 > 0) print "\\e[0;30m\\e[47m##\\e[m"; else print "##"}'
+}
+
+__git_status ()
+{
+	. /etc/couleurs
+	local GIT_LOCAL="$([ "$GIT_STATUS" == "." ] && echo ".")"
+	[ "$GIT_UNTRACKED" == "1" ] && local statut="$(git status -sbu $GIT_LOCAL 2>/dev/null)"
+	[ "$GIT_UNTRACKED" != "1" ] && local statut="$(git status -sbuno $GIT_LOCAL 2>/dev/null)"
+	if [ -n "$statut" ]
+	then
+		echo -e "$statut"
+		local NB=$(git ls-files --others --exclude-standard | wc -l)
+		local Ps=""
+		[ $NB -gt 1 ] && local Ps="s"
+    [ $NB -ge 1 ] && echo -e "${BBleu}??${Normal} ${NB} ${Rouge}fichier${Ps} non suivi${Ps} ${BNoir}: GIT_UNTRACKED = $([ "${GIT_UNTRACKED}" == "1" ] && echo "1" || echo "0")"
+	fi
+}
+
+__git_ps1 ()
+{
+	. /etc/couleurs
+	local GIT_LOCAL="$([ "$GIT_STATUS" == "." ] && echo ".")"
+	local gitdir=$(git branch -a 2>/dev/null);  # sera vide sauf si dans un repo Git
+
+	if [ -n "$gitdir" ]    # Si nous sommes dans un dossier Git
+	then
+		if [ "$GIT_STATUS" != "0" ]
+		then
+			if [ "$GIT_CELIBEC" != "0" ]
+			then
+				git fetch origin $(__git_branch) >/dev/null 2>&1;
+			fi
+			local livrables=""
+			local status=$(__git_status);
+			local nligne=$(echo $( echo "${status}" | wc -l )-1|bc)
+			if [ "$GIT_LIVRABLES" == "0" ]
+			then
+				status=$( echo -e "${status}" | grep -v 'livrables/')
+				local nligfl=$nligne
+				nligne=$( echo $( echo "${status}" | wc -l )"-1" | bc )
+				local nlignemasq=$(echo "${nligfl}-${nligne}" | bc)
+				[ "$nlignemasq" != "0" ] && livrables="${Normal}## ${Rouge}${nlignemasq}${Normal} fichiers ${BNoir}(masqués)${Normal} dans livrables ${BNoir}GIT_LIVRABLES = 0${Normal}"
+			fi
+			local branch=$(__git_branch)
+			local branch_color="${Normal}## ${Vert}${branch}${Normal}"
+			local remote="${Normal}## ${BNoir}"$(git config --local --get remote.origin.url | sed -e "s/:/$(echo -e ${Normal}):$(echo -e ${BNoir})/" -e "s,/,$(echo -e ${Normal})/$(echo -e ${BPourpre})," -e 's/\.git$//')"${Normal}"
+		
+			echo
+			if [ -n "$status" ]
+			then
+				nligne=$(echo "${nligne}" | tr -d ' ')
+#				[[ "$(echo "${status}" | wc -l)" -gt "1" ]] && echo -e "${status}";
+				echo -e "${status}"
+				[ -n "$livrables" ] && echo -e "${livrables}"
+				echo -e "$remote"
+				echo -e "${branch_color} : ${Normal}$([ "$nligne" -eq "0" ] && echo -n "Aucun" || echo -n "${nligne}")${Rouge} fichier$([ "$nligne" -gt "1" ] && echo -n "s") à vérifier ${BNoir}: GIT_STATUS = $GIT_STATUS${Normal}";
+			else
+				echo -e "$remote"
+				echo -e "${branch_color} : ${BRouge}[${BVert}.git${BRouge}]${Normal}";
+				
+				echo
+				echo
+			fi
+		else
+			echo -e "\n$(git status -sbu $GIT_LOCAL | head -n1) ${BNoir}: GIT_STATUS = $GIT_STATUS${Normal}"
+		fi
+	fi
+}
+
