@@ -10,6 +10,10 @@ This should work as-is in most bash environments.
 
 ## shell prompt
 
+#### Works with the following env variables:
+GIT_STATUS=0|1<br/>
+GIT_UNTRACKED=0|1<br/>
+
 ##### bash.bashrc
     . /etc/gitprompt
     export PS1="\$(__git_ps1)\n${PS1}"    
