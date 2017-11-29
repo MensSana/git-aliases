@@ -16,6 +16,13 @@ This should work as-is in most bash environments.
 
 ##### bash.bashrc
     . /etc/gitprompt
-    export PS1="\$(__git_ps1)\n${PS1}"    
-
-    
+    __set_ps1()
+    {
+      . /etc/couleurs
+      export PS1="\[$Rouge\][\[$BVert\]\u\[$Rouge\]@\[$BJaune\]\h\[$Rouge\]:\[$BCyan\]\W\[$Rouge\]]\n\[$Vert\]\$ \[$Normal\]"
+      if test -z "$WINELOADERNOEXEC"
+      then
+        export PS1="\$(__git_ps1)\n${PS1}"
+        export PS1="${PS1}"
+      fi
+    }
