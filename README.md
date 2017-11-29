@@ -11,8 +11,8 @@ This should work as-is in most bash environments.
 ## shell prompt
 
 #### Works with the following env variables:
-GIT_STATUS=0|1<br/>
-GIT_UNTRACKED=0|1<br/>
+    GIT_STATUS=0|1
+    GIT_UNTRACKED=0|1
 
 ##### bash.bashrc
     . /etc/gitprompt
